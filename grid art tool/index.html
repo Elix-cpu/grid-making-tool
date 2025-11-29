@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Grid Making Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- PWA MANIFEST LINK -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- MOBILE ICONS & THEME -->
+    <meta name="theme-color" content="#222222">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <style>
+        /* GLOBAL DARK THEME */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            text-align: center; 
+            background: #222; 
+            color: white; 
+            padding: 20px; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* CONTROL PANEL CONTAINER */
+        .controls { 
+            margin-bottom: 20px; 
+            background: #333; 
+            padding: 20px; 
+            border-radius: 12px; 
+            display: inline-block; 
+            text-align: left; 
+            min-width: 340px;
+        }
+
+        /* CANVAS */
+        canvas { 
+            border: 1px solid #444; 
+            max-width: 90vw; 
+            max-height: 80vh; 
+            background: #000; 
+            cursor: crosshair; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        /* ROW STYLING */
+        .control-row { 
+            margin-bottom: 12px; 
+            display: flex; 
+            align-items: center;
+            justify-content: flex-start; /* Aligns everything to the left */
+        }
+        
+        .split-row { justify-content: space-between; }
+
+        /* SEPARATORS */
+        hr { border: 0; border-top: 1px solid #444; margin: 15px 0; }
+        
+        /* INPUTS (Sharp Corners) */
+        input[type="number"] { 
+            width: 50px; 
+            text-align: center; 
+            padding: 5px; 
+            border: 1px solid #555; 
+            border-radius: 0px; /* Sharp corners */
+            font-weight: bold;
+            background: transparent; 
+            color: white;            
+        }
+
+        /* DROPDOWN */
+        select { 
+            padding: 5px; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-right: 10px; 
+            border: none;
+            background: transparent; 
+            color: white;            
+            font-size: 0.95rem;
+            margin-left: -5px; 
+        }
+        select option { background: #333; color: white; }
+
+        /* SLIDER */
+        input[type="range"] { 
+            width: 180px; 
+            vertical-align: middle; 
+            cursor: pointer; 
+        }
+        
+        /* COLOR PICKER */
+        input[type="color"] {
+            border: none;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            background: none;
+        }
+
+        /* SAVE BUTTON */
+        #saveBtn {
+            background-color: #444; 
+            color: white;
+            border: 1px solid #666;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        #saveBtn:hover { background-color: #555; border-color: #888; }
+
+        /* CHECKBOX */
+        input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; vertical-align: middle; }
+        
+        .hint { color: #888; font-size: 0.8rem; margin-top: 10px; font-style: italic; text-align: center;}
+
+        /* FOOTER STYLING (NEW) */
+        footer {
+            margin-top: auto; /* Push to bottom */
+            padding-top: 40px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+        footer a { color: #888; text-decoration: none; border-bottom: 1px dotted #666; transition: 0.2s;}
+        footer a:hover { color: white; border-bottom: 1px solid white;}
+        
+        .coffee-btn {
+            background: #FFDD00;
+            color: black !important;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-decoration: none !important;
+            border: none !important;
+            display: inline-block;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(255, 221, 0, 0.2);
+        }
+        .coffee-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 221, 0, 0.3); }
+
+    </style>
+</head>
+<body>
+
+    <h2 style="font-weight: 400; letter-spacing: 1px; margin-bottom: 20px;">⭐ GRID MAKING TOOL ⭐</h2>
+
+    <div class="controls">
+        <div class="control-row split-row">
+            <input type="file" id="imageLoader" accept="image/*" style="font-size: 0.9rem; margin-left:-5px;">
+            <button id="saveBtn">Save Image</button>
+        </div>
+
+        <hr>
+
+        <div class="control-row">
+            <select id="modeSelect">
+                <option value="count">Grid Count</option>
+                <option value="shape">Cell Shape</option>
+            </select>
+            
+            <input type="number" id="inputX" value="4" min="1">
+            <span style="margin: 0 5px; font-weight:bold; color:#888;">:</span>
+            <input type="number" id="inputY" value="4" min="1">
+        </div>
+
+        <div class="control-row">
+            <input type="range" id="scaleSlider" min="0.25" max="5.0" step="0.1" value="1">
+            
+            <input type="number" id="scaleInput" value="1" step="0.1" min="0.1" style="width: 50px; margin-left: 10px;">
+            <span style="color:#888; font-weight:bold; margin-left: 4px;">x</span>
+        </div>
+
+        <div class="control-row">
+            <span style="margin-right: 10px; font-weight: bold; font-size: 0.9rem;">Grid Color:</span>
+            <input type="color" id="colorPicker" value="#ffffff">
+        </div>
+
+        <hr>
+
+        <div class="control-row">
+            <input type="checkbox" id="grayscaleToggle">
+            <label for="grayscaleToggle" style="font-size:0.9rem; cursor:pointer; margin-left: 8px;">B&W Mode</label>
+        </div>
+        
+        <div class="hint">💡 Tip: Click square to Focus. Click again to Reset.</div>
+    </div>
+
+    <br>
+    <canvas id="artCanvas"></canvas>
+
+    <!-- NEW FOOTER SECTION -->
+    <footer>
+        <p>Built with AI by <a href="https://github.com/Elix-cpu" target="_blank">Elix-cpu</a></p>
+        <p>This tool is open source and runs entirely on your device.</p>
+        
+        <!-- DONATION BUTTON (Replace link with your own) -->
+        <a href="https://www.buymeacoffee.com" target="_blank" class="coffee-btn">
+            ☕ Buy me a Coffee
+        </a>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('artCanvas');
+        const ctx = canvas.getContext('2d');
+        const imageLoader = document.getElementById('imageLoader');
+        
+        const modeSelect = document.getElementById('modeSelect');
+        const inputX = document.getElementById('inputX');
+        const inputY = document.getElementById('inputY');
+        const scaleSlider = document.getElementById('scaleSlider');
+        const scaleInput = document.getElementById('scaleInput');
+        const colorPicker = document.getElementById('colorPicker');
+        const grayscaleToggle = document.getElementById('grayscaleToggle');
+        const saveBtn = document.getElementById('saveBtn');
+        
+        let img = new Image();
+        
+        // State Variables
+        let mode = 'count'; 
+        let valX = 4;
+        let valY = 4;
+        let scale = 1.0;
+        let gridColor = 'white';
+        let isGrayscale = false;
+        let focusCell = null;
+        let calculatedCols = 4;
+        let calculatedRows = 4;
+
+        // --- SET DEFAULT IMAGE ON LOAD ---
+        img.src = 'image_12.png'; 
+        
+        img.onload = function(){
+            canvas.width = img.width;
+            canvas.height = img.height;
+            draw();
+        }
+        
+        img.onerror = function(){
+            console.log("Could not load default image. Using blank canvas.");
+        }
+
+        // 1. IMAGE UPLOAD
+        imageLoader.addEventListener('change', function(e){
+            let reader = new FileReader();
+            reader.onload = function(event){
+                img.onload = function(){
+                    focusCell = null;
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    draw();
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        // 2. INPUT HANDLERS
+        modeSelect.addEventListener('change', function(){
+            mode = this.value;
+            if(mode === 'count') { inputX.value = 4; inputY.value = 4; } 
+            else { inputX.value = 1; inputY.value = 1; }
+            valX = parseFloat(inputX.value); valY = parseFloat(inputY.value);
+            focusCell = null; 
+            draw();
+        });
+
+        inputX.addEventListener('input', function(){ valX = parseFloat(this.value) || 1; draw(); });
+        inputY.addEventListener('input', function(){ valY = parseFloat(this.value) || 1; draw(); });
+
+        scaleSlider.addEventListener('input', function(){
+            scale = parseFloat(this.value);
+            scaleInput.value = scale;
+            focusCell = null;
+            draw();
+        });
+        scaleInput.addEventListener('input', function(){
+            scale = parseFloat(this.value);
+            scaleSlider.value = scale;
+            focusCell = null;
+            draw();
+        });
+        
+        colorPicker.addEventListener('input', function(){ gridColor = this.value; draw(); });
+
+        grayscaleToggle.addEventListener('change', function(){
+            isGrayscale = this.checked;
+            draw();
+        });
+
+        saveBtn.addEventListener('click', function(){
+            const link = document.createElement('a');
+            link.download = 'grid-art-reference.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        // 3. FOCUS CLICK
+        canvas.addEventListener('mousedown', function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const mouseX = (e.clientX - rect.left) * scaleX;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+
+            const cellW = canvas.width / calculatedCols;
+            const cellH = canvas.height / calculatedRows;
+
+            const clickedCol = Math.floor(mouseX / cellW);
+            const clickedRow = Math.floor(mouseY / cellH);
+
+            if (focusCell && focusCell.col === clickedCol && focusCell.row === clickedRow) {
+                focusCell = null;
+            } else {
+                focusCell = { col: clickedCol, row: clickedRow };
+            }
+            draw();
+        });
+
+        // 4. DRAWING LOOP
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if(isGrayscale) {
+                ctx.filter = 'grayscale(100%)';
+            } else {
+                ctx.filter = 'none';
+            }
+
+            ctx.drawImage(img, 0, 0);
+
+            if (mode === 'count') {
+                calculatedCols = Math.max(1, Math.round(valX * scale));
+                calculatedRows = Math.max(1, Math.round(valY * scale));
+            } else {
+                let densityBase = 10; 
+                calculatedCols = Math.max(1, Math.round(densityBase * scale));
+                let cellWidth = canvas.width / calculatedCols;
+                let ratio = valX / valY;
+                let cellHeight = cellWidth / ratio;
+                calculatedRows = canvas.height / cellHeight;
+            }
+
+            if (focusCell) {
+                ctx.filter = 'none'; 
+                ctx.fillStyle = "rgba(0, 0, 0, 0.85)"; 
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                if(isGrayscale) ctx.filter = 'grayscale(100%)';
+                
+                const cellW = canvas.width / calculatedCols;
+                const cellH = canvas.height / calculatedRows;
+                
+                ctx.drawImage(
+                    img, 
+                    focusCell.col * cellW, focusCell.row * cellH, cellW, cellH, 
+                    focusCell.col * cellW, focusCell.row * cellH, cellW, cellH
+                );
+            }
+
+            ctx.filter = 'none'; 
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = Math.max(2, canvas.width / 500);
+
+            let stepX = canvas.width / calculatedCols;
+            for (let i = stepX; i < canvas.width; i += stepX) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+
+            let stepY = canvas.height / calculatedRows;
+            for (let i = stepY; i < canvas.height; i += stepY) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+        }
+
+        // SERVICE WORKER REGISTRATION (SAFE MODE)
+        if ('serviceWorker' in navigator && window.location.protocol !== 'blob:') {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log("SW Registered"))
+                    .catch(err => console.log("SW Failed:", err));
+            });
+        }
+    </script>
+
+</body>
+</html>
