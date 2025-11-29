@@ -29,6 +29,9 @@ Installable on iOS and Android home screens. Works completely offline once insta
 
 <img width="2586" height="1577" alt="image" src="https://github.com/user-attachments/assets/b7ee195d-04d0-4a39-a89e-aa2178110d7e" />
 
+<img width="2603" height="1335" alt="image" src="https://github.com/user-attachments/assets/c8511ef8-e61f-4b79-af05-b89d80384af3" />
+
+
 ## Install & Run Locally
 Since the project uses Service Workers and Canvas image manipulation, it requires a local server environment to avoid security errors. 
 #### Python
