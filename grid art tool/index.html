@@ -123,15 +123,45 @@
         
         .hint { color: #888; font-size: 0.8rem; margin-top: 10px; font-style: italic; text-align: center;}
 
-        /* FOOTER STYLING (NEW) */
+       /* FOOTER STYLING (FIXED) */
         footer {
-            margin-top: auto; /* Push to bottom */
-            padding-top: 40px;
-            color: #666;
+            margin-top: 40px; /* Space between canvas and footer */
+            padding-bottom: 40px; /* Space at the very bottom */
+            color: #888;
             font-size: 0.85rem;
+            width: 100%;
+            text-align: center;
         }
-        footer a { color: #888; text-decoration: none; border-bottom: 1px dotted #666; transition: 0.2s;}
-        footer a:hover { color: white; border-bottom: 1px solid white;}
+        
+        footer a { 
+            color: #ccc; 
+            text-decoration: none; 
+            border-bottom: 1px dotted #666; 
+            transition: 0.2s;
+        }
+        footer a:hover { 
+            color: white; 
+            border-bottom: 1px solid white;
+        }
+        
+        .coffee-btn {
+            background: #FFDD00;
+            color: black !important;
+            padding: 10px 20px; /* Bigger touch target */
+            border-radius: 25px;
+            font-weight: bold;
+            text-decoration: none !important;
+            border: none !important;
+            display: inline-block;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(255, 221, 0, 0.2);
+            font-size: 0.9rem;
+        }
+        .coffee-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 15px rgba(255, 221, 0, 0.3); 
+            background: #ffe600;
+        }
         
         .coffee-btn {
             background: #FFDD00;
@@ -400,3 +430,4 @@
 </body>
 
 </html>
+
