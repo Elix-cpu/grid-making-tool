@@ -56,9 +56,9 @@ Contributions are welcome! If you want to add any features:
 5. Open a Pull Request
 
 ## Roadmap
-- [] Grid mode for perspective drawing
-- [] Local Storage support to remember user preferences (grid color/size) on reload
-- [] Zoom/Pan capability for large images
+- [ ] Grid mode for perspective drawing
+- [ ] Local Storage support to remember user preferences (grid color/size) on reload
+- [ ] Zoom/Pan capability for large images
 
 ## Privacy & Security 
 All image processing is performed locally in your browser and your photos are never uploaded to a server/stored in a database.
